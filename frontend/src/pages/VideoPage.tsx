@@ -4,6 +4,7 @@ import { Button } from "../components/ui/button"
 import { toast } from "sonner"
 import { getAuthHeader } from "../lib/auth"
 import { API_BASE } from "../lib/api"
+import { useI18n } from "../lib/useI18n"
 import {
   FALLBACK_VIDEO_MODELS,
   chooseDefaultModel,
@@ -52,6 +53,7 @@ interface VideoGenerationResponse {
 }
 
 export default function VideoPage() {
+  const { t } = useI18n()
   const [prompt, setPrompt] = useState("")
   const [ratio, setRatio] = useState("16:9")
   const [duration, setDuration] = useState(5)
@@ -105,7 +107,7 @@ export default function VideoPage() {
       if (!res.ok) {
         const detail = data?.detail || data?.error || `HTTP ${res.status}`
         setError(String(detail))
-        toast.error(`生成失败: ${String(detail).slice(0, 80)}`)
+        toast.error(t("videos.failed", { reason: String(detail).slice(0, 80) }))
         return
       }
 
@@ -123,17 +125,17 @@ export default function VideoPage() {
         }))
 
       if (newVideos.length === 0) {
-        setError("未返回视频，请重试")
-        toast.error("未返回视频，请重试")
+        setError(t("videos.noVideo"))
+        toast.error(t("videos.noVideo"))
         return
       }
 
       setVideos(prev => [...newVideos, ...prev])
-      toast.success(`成功生成 ${newVideos.length} 个视频`)
+      toast.success(t("videos.success", { n: newVideos.length }))
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "网络错误"
+      const msg = err instanceof Error ? err.message : t("images.networkError")
       setError(msg)
-      toast.error(`生成失败: ${msg}`)
+      toast.error(t("videos.failed", { reason: msg }))
     } finally {
       setLoading(false)
     }
@@ -151,30 +153,30 @@ export default function VideoPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">视频生成</h2>
-        <p className="text-muted-foreground">选择视频模型生成短视频，支持比例、时长和数量参数。</p>
+        <h2 className="text-2xl font-bold tracking-tight">{t("videos.title")}</h2>
+        <p className="text-muted-foreground">{t("videos.subtitle")}</p>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">视频描述 (Prompt)</label>
+          <label className="text-sm font-medium">{t("videos.promptLabel")}</label>
           <textarea
             rows={3}
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
-            placeholder="描述你想生成的视频，例如：雨夜霓虹街头，一只黑猫慢慢穿过水洼，电影感镜头"
+            placeholder={t("videos.promptPlaceholder")}
             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             disabled={loading}
             onKeyDown={e => {
               if (e.key === "Enter" && e.ctrlKey) handleGenerate()
             }}
           />
-          <p className="text-xs text-muted-foreground">Ctrl+Enter 快速生成</p>
+          <p className="text-xs text-muted-foreground">{t("videos.ctrlEnter")}</p>
         </div>
 
         <div className="flex flex-wrap gap-4 items-end">
           <div className="space-y-1.5 min-w-[260px]">
-            <label className="text-sm font-medium">视频模型</label>
+            <label className="text-sm font-medium">{t("videos.modelLabel")}</label>
             <select
               value={model}
               onChange={e => setModel(e.target.value)}
@@ -192,7 +194,7 @@ export default function VideoPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">视频比例</label>
+            <label className="text-sm font-medium">{t("videos.ratioLabel")}</label>
             <div className="flex gap-2">
               {ASPECT_RATIOS.map(r => (
                 <button
@@ -212,7 +214,7 @@ export default function VideoPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">视频时长</label>
+            <label className="text-sm font-medium">{t("videos.durationLabel")}</label>
             <div className="flex gap-2">
               {DURATIONS.map(v => (
                 <button
@@ -225,14 +227,14 @@ export default function VideoPage() {
                   }`}
                   disabled={loading}
                 >
-                  {v}s
+                  {t("videos.durationUnit", { n: v })}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">生成数量</label>
+            <label className="text-sm font-medium">{t("videos.countLabel")}</label>
             <div className="flex gap-2">
               {[1, 2].map(v => (
                 <button
@@ -245,7 +247,7 @@ export default function VideoPage() {
                   }`}
                   disabled={loading}
                 >
-                  {v} 个
+                  {t("videos.countUnit", { n: v })}
                 </button>
               ))}
             </div>
@@ -261,8 +263,8 @@ export default function VideoPage() {
             className="ml-auto h-10 px-6 gap-2"
           >
             {loading
-              ? <><RefreshCw className="h-4 w-4 animate-spin" /> 生成中...</>
-              : <><Wand2 className="h-4 w-4" /> 生成视频</>
+              ? <><RefreshCw className="h-4 w-4 animate-spin" /> {t("videos.generating")}</>
+              : <><Wand2 className="h-4 w-4" /> {t("videos.generate")}</>
             }
           </Button>
         </div>
@@ -282,8 +284,8 @@ export default function VideoPage() {
               <RefreshCw className="h-6 w-6 animate-spin absolute -bottom-1 -right-1 text-primary" />
             </div>
             <div className="text-center">
-              <p className="font-medium">正在生成视频...</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">视频生成耗时通常更长，请保持页面打开</p>
+              <p className="font-medium">{t("videos.generatingLong")}</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">{t("videos.generatingHint")}</p>
             </div>
           </div>
         </div>
@@ -292,9 +294,9 @@ export default function VideoPage() {
       {videos.length > 0 && !loading && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">生成结果 ({videos.length} 个)</h3>
+            <h3 className="font-semibold">{t("videos.resultsTitle", { n: videos.length })}</h3>
             <Button variant="ghost" size="sm" onClick={() => setVideos([])}>
-              清空
+              {t("videos.clear")}
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -309,18 +311,18 @@ export default function VideoPage() {
                   />
                   <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button size="sm" variant="secondary" onClick={() => handleDownload(video.url, idx)} className="gap-1.5">
-                      <Download className="h-3.5 w-3.5" /> 下载
+                      <Download className="h-3.5 w-3.5" /> {t("videos.download")}
                     </Button>
                     <Button size="sm" variant="secondary" onClick={() => window.open(video.url, "_blank")}>
-                      打开
+                      {t("videos.open")}
                     </Button>
                   </div>
                 </div>
                 <div className="p-3 space-y-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="bg-muted rounded px-1.5 py-0.5 font-mono">{video.ratio}</span>
-                    <span className="bg-muted rounded px-1.5 py-0.5 font-mono">{video.duration || duration}s</span>
-                    <span className="bg-muted rounded px-1.5 py-0.5 font-mono">请求 {video.size}</span>
+                    <span className="bg-muted rounded px-1.5 py-0.5 font-mono">{t("videos.durationUnit", { n: video.duration || duration })}</span>
+                    <span className="bg-muted rounded px-1.5 py-0.5 font-mono">{t("videos.requested", { size: video.size })}</span>
                     {video.model && <span className="bg-muted rounded px-1.5 py-0.5 font-mono">{video.model}</span>}
                     <span className="truncate">{video.revised_prompt.slice(0, 80)}</span>
                   </div>
@@ -337,8 +339,8 @@ export default function VideoPage() {
           <div className="flex flex-col items-center gap-4 text-muted-foreground">
             <VideoIcon className="h-16 w-16 text-muted-foreground/20" />
             <div className="text-center">
-              <p className="font-medium">还没有生成视频</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">在上方输入描述，点击「生成视频」开始创作</p>
+              <p className="font-medium">{t("videos.empty")}</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">{t("videos.emptyHint")}</p>
             </div>
           </div>
         </div>
