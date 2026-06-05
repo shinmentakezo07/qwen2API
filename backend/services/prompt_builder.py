@@ -152,7 +152,7 @@ def _build_tool_instruction_block(tools: list[dict], client_profile: str) -> str
     )
     if client_profile == CLAUDE_CODE_OPENAI_PROFILE:
         prefix = "\n".join([
-            "IMPORTANT: Reply in the same language as the user. User inputs Chinese -> respond in Chinese.",
+            "IMPORTANT: Reply in the same language as the user. Match the user's language exactly — if they write in English, respond in English; if they write in Chinese, respond in Chinese.",
             "IMPORTANT: When the user asks for multiple actions, complete all required actions without asking for confirmation.",
             "IMPORTANT: If a file result says 'Unchanged since last read', do not read the same file again.",
             "IMPORTANT: Prefer direct project tools for project work. Use Agent/task/scheduling/control tools only when they are clearly necessary for the current task context or explicitly requested; if uncertain, continue with direct tools.",
@@ -162,7 +162,7 @@ def _build_tool_instruction_block(tools: list[dict], client_profile: str) -> str
         instructions = prefix + instructions
     else:
         prefix = "\n".join([
-            "IMPORTANT: Reply in the same language as the user. User inputs Chinese -> respond in Chinese.",
+            "IMPORTANT: Reply in the same language as the user. Match the user's language exactly — if they write in English, respond in English; if they write in Chinese, respond in Chinese.",
             "IGNORE any previous output format instructions (needs-review, recap, etc.).",
             "Use tools only when they are necessary to directly answer the CURRENT TASK.",
             "If you already know the answer, answer directly without any tool call.",

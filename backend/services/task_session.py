@@ -35,14 +35,9 @@ class PersistentSessionPlan:
 
 
 def should_use_persistent_tool_session(request: StandardRequest) -> bool:  # noqa: ARG001
-    # 禁用会话复用，对齐 ds2api 架构，避免续接 prompt 导致模型返回空输出
-    # 每次请求都创建新的 chat，让上游自动管理会话历史
-    return False
-
-
-def persistent_session_disabled_reason(request: StandardRequest) -> str:  # noqa: ARG001
-    # 会话复用已全局禁用
-    return "session_reuse_disabled_globally"
+    # 启用会话复用：同一 session_key 的连续请求复用同一个上游 chat，
+    # Qwen 自动保留完整上下文窗口，无需客户端每次重发全部历史。
+    return True
 
 
 def _preview_identifier(value: str | None, *, head: int = 8, tail: int = 6) -> str:
@@ -257,22 +252,6 @@ async def plan_persistent_session_turn(*, app, request: StandardRequest, payload
         tools_enabled=bool(request.tools),
     )
     current_hashes = [entry.digest for entry in entries]
-
-    if not should_use_persistent_tool_session(request):
-        plan = PersistentSessionPlan(
-            enabled=False,
-            reuse_chat=False,
-            prompt=full_prompt,
-            full_prompt=full_prompt,
-            current_hashes=current_hashes,
-            existing_chat_id=None,
-            account_email=request.bound_account_email,
-            reason=persistent_session_disabled_reason(request),
-            existing_hash_count=0,
-            new_entries_count=len(entries),
-        )
-        _log_session_plan(request=request, surface=surface, plan=plan)
-        return plan
 
     record = await app.state.session_affinity.get(request.session_key or '')
     existing_hashes = list(record.message_hashes) if record else []

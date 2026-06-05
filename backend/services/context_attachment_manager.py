@@ -34,6 +34,22 @@ async def prepare_context_attachments(*, app, payload: dict[str, Any], surface: 
     tools = payload.get("tools", []) or []
     messages = payload.get("messages", []) or []
     manual_attachments = list(existing_attachments or [])
+
+    # If this session already has a persistent upstream chat, skip context offloading
+    # entirely — Qwen's native context window already holds the full conversation.
+    existing_record = await affinity.get(session_key)
+    if existing_record and existing_record.chat_id:
+        return {
+            "payload": payload,
+            "session_key": session_key,
+            "context_mode": "inline",
+            "upstream_files": list(payload.get("upstream_files", []) or []),
+            "bound_account": None,
+            "bound_account_email": existing_record.account_email,
+            "generated_local_files": [],
+            "attachment_fallback": False,
+        }
+
     plan = context_offloader.plan(messages, tools=tools, client_profile=client_profile)
     use_generated_context_files = bool(plan.generated_files) and not bool(tools)
     if not use_generated_context_files and not manual_attachments:

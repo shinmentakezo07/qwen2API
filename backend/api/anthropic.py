@@ -398,7 +398,7 @@ async def anthropic_messages(request: Request):
                         standard_request.workspace_root or "-",
                         len(prompt),
                         prompt_tail(prompt),
-                        (getattr(standard_request, "chat_type", "t2t") != "t2t") or not bool(getattr(standard_request, "persistent_session", False)),
+                        (getattr(standard_request, "chat_type", "t2t") not in ("t2t", "web_dev", "deep_research")) or not bool(getattr(standard_request, "persistent_session", False)),
                         bool(getattr(standard_request, "persistent_session", False)),
                     )
                     history_messages = original_history_messages
@@ -589,7 +589,7 @@ async def anthropic_messages(request: Request):
                 standard_request.workspace_root or "-",
                 len(prompt),
                 prompt_tail(prompt),
-                (getattr(standard_request, "chat_type", "t2t") != "t2t") or not bool(getattr(standard_request, "persistent_session", False)),
+                (getattr(standard_request, "chat_type", "t2t") not in ("t2t", "web_dev", "deep_research")) or not bool(getattr(standard_request, "persistent_session", False)),
                 bool(getattr(standard_request, "persistent_session", False)),
             )
             history_messages = original_history_messages

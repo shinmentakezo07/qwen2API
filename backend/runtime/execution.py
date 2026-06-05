@@ -1483,8 +1483,9 @@ async def collect_completion_run(
         return RuntimeExecutionResult(state=state, chat_id=chat_id, acc=acc)
 
     request_chat_type = getattr(request, "chat_type", "t2t") or "t2t"
-    use_prewarmed_chat = request_chat_type == "t2t" and not bool(getattr(request, "skip_prewarmed_chat_ids", False))
-    existing_chat_id = getattr(request, "upstream_chat_id", None) if request_chat_type == "t2t" else None
+    _TEXT_CHAT_TYPES = frozenset(("t2t", "web_dev", "deep_research"))
+    use_prewarmed_chat = request_chat_type in _TEXT_CHAT_TYPES and not bool(getattr(request, "skip_prewarmed_chat_ids", False))
+    existing_chat_id = getattr(request, "upstream_chat_id", None) if request_chat_type in _TEXT_CHAT_TYPES else None
     update_request_context(
         surface=getattr(request, "surface", "-"),
         requested_model=getattr(request, "requested_model", None) or getattr(request, "response_model", "-"),
@@ -1499,7 +1500,7 @@ async def collect_completion_run(
         tools=list(getattr(request, "tool_names", []) or []),
         prompt=prompt,
     )
-    delete_on_close = (request_chat_type != "t2t") or not bool(getattr(request, "persistent_session", False))
+    delete_on_close = (request_chat_type not in _TEXT_CHAT_TYPES) or not bool(getattr(request, "persistent_session", False))
     if test_markers or settings.TRACE_RESPONSE_FINGERPRINTS:
         log.info(
             "[RuntimePrompt] marker=%s surface=%s model=%s prompt_len=%s delete_on_close=%s persistent_session=%s existing_chat_id=%s",

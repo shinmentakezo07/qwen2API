@@ -64,7 +64,7 @@ class CLIProxy:
             force_thinking=model_mode.force_thinking,
             enable_search=model_mode.chat_type == "deep_research",
             model_mode=model_mode.mode,
-            skip_prewarmed_chat_ids=model_mode.chat_type != "t2t",
+            skip_prewarmed_chat_ids=model_mode.chat_type not in ("t2t", "web_dev", "deep_research"),
             workspace_root=workspace_root,
         )
 
@@ -110,7 +110,7 @@ class CLIProxy:
             force_thinking=model_mode.force_thinking,
             enable_search=model_mode.chat_type == "deep_research",
             model_mode=model_mode.mode,
-            skip_prewarmed_chat_ids=model_mode.chat_type != "t2t",
+            skip_prewarmed_chat_ids=model_mode.chat_type not in ("t2t", "web_dev", "deep_research"),
             workspace_root=workspace_root,
         )
 
@@ -152,7 +152,7 @@ class CLIProxy:
             force_thinking=model_mode.force_thinking,
             enable_search=model_mode.chat_type == "deep_research",
             model_mode=model_mode.mode,
-            skip_prewarmed_chat_ids=model_mode.chat_type != "t2t",
+            skip_prewarmed_chat_ids=model_mode.chat_type not in ("t2t", "web_dev", "deep_research"),
         )
 
     @staticmethod
