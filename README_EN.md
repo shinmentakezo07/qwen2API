@@ -8,7 +8,7 @@ Telegram Group: [https://t.me/qwen2api](https://t.me/qwen2api)
 [![Forks](https://img.shields.io/github/forks/YuJunZhiXue/qwen2API?style=flat-square)](https://github.com/YuJunZhiXue/qwen2API/network/members)
 [![Docker Pulls](https://img.shields.io/docker/pulls/yujunzhixue/qwen2api?style=flat-square)](https://hub.docker.com/r/yujunzhixue/qwen2api)
 
-Language: English | [中文](./README_CN.md)
+语言 / Language: [中文](./README.md)
 
 qwen2API converts the Qwen web-side capabilities into OpenAI, Anthropic Claude, and Gemini compatible interfaces, and provides a web management console, account pool, image generation, file upload, and multi-architecture Docker deployment.
 
@@ -687,4 +687,3 @@ Disclaimer:
 - Users should independently evaluate the laws and regulations of their region, upstream service terms, account compliance, and data security requirements.
 - Risks arising from the use of this project, including account bans, request restrictions, data loss, service interruptions, or other risks, are borne by the user.
 - If rights holders believe that the content of this project infringes their legitimate rights and interests, please raise the issue via the repository's Issue tracker, and the maintainers will handle it after verification.
-
